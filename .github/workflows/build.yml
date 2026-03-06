@@ -14,14 +14,16 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Build Shaded Jar
-        # الأمر ده بيجبر Gradle إنه يدمج الـ Core مع الـ Spigot في ملف واحد
+      - name: Build and Shade
+        # الأمر ده هيجبر النظام يدمج كل الموديلات في ملف واحد
         run: |
           chmod +x gradlew
+          ./gradlew :hackedserver-spigot:build :hackedserver-core:build
           ./gradlew :hackedserver-spigot:shadowJar
 
-      - name: Upload Jar
+      - name: Upload Final Jar
         uses: actions/upload-artifact@v4
         with:
-          name: HackedServer-Final
+          name: HackedServer-Merg-Fixed
+          # هناخد الملف اللي طلع من فولدر الـ spigot تحديداً بعد الدمج
           path: "hackedserver-spigot/build/libs/*-all.jar"

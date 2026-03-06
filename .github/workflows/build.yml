@@ -1,4 +1,4 @@
-name: Build HackedServer Organized
+name: Build HackedServer
 on: workflow_dispatch
 
 jobs:
@@ -8,30 +8,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Build with Gradle
-        # الأمر ده بيطلع النسخة الكاملة (Shadow) لكل الأقسام
-        run: |
-          chmod +x gradlew
-          ./gradlew clean shadowJar --no-daemon
+        run: ./gradlew build -x test
 
-      - name: Organize Artifacts
-        # هنا بنرتب الملفات في مجلدات واضحة ومنفصلة
-        run: |
-          mkdir -p output/spigot
-          mkdir -p output/velocity
-          
-          # بنسحب ملفات الـ all.jar لأنها هي النسخ الشغالة والكاملة
-          cp hackedserver-spigot/build/libs/*-all.jar output/spigot/ || true
-          cp hackedserver-velocity/build/libs/*-all.jar output/velocity/ || true
-
-      - name: Upload Files
+      - name: Upload Jar
         uses: actions/upload-artifact@v4
         with:
-          name: HackedServer-Final-Pack
-          path: output/
+          name: HackedServer-Jars
+          path: "**/build/libs/*.jar"

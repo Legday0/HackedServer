@@ -1,4 +1,4 @@
-name: Build HackedServer Final
+name: Build HackedServer Separate
 on: workflow_dispatch
 
 jobs:
@@ -15,13 +15,23 @@ jobs:
           distribution: 'temurin'
 
       - name: Build All Modules
-        # الأمر ده هيدور على كل ملف pom.xml في المشروع ويشغله بالترتيب الصح
-        run: |
-          mvn clean package -DskipTests
+        # هينفذ الـ Build على المشروع بالكامل وكل موديول هيطلع ملفه الخاص
+        run: mvn clean package -DskipTests
 
-      - name: Upload Velocity & Spigot Jars
+      - name: Upload Spigot Version
         uses: actions/upload-artifact@v4
         with:
-          name: HackedServer-Final-Jars
-          # هنا بناخد أي ملف Jar طلع في أي مجلد target عشان نضمن وصولنا للـ Velocity
-          path: "**/target/*.jar"
+          name: HackedServer-Spigot
+          path: "hackedserver-spigot/target/*.jar"
+
+      - name: Upload Velocity Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: HackedServer-Velocity
+          path: "hackedserver-velocity/target/*.jar"
+
+      - name: Upload Core Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: HackedServer-Core
+          path: "hackedserver-core/target/*.jar"

@@ -11,16 +11,17 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21' # تم التحديث ليتوافق مع سيرفرك
+          java-version: '21'
           distribution: 'temurin'
 
-      - name: Build with Gradle
+      - name: Build Shaded Jar
+        # الأمر ده بيجبر Gradle إنه يدمج الـ Core مع الـ Spigot في ملف واحد
         run: |
           chmod +x gradlew
-          ./gradlew build -x test
+          ./gradlew :hackedserver-spigot:shadowJar
 
       - name: Upload Jar
         uses: actions/upload-artifact@v4
         with:
-          name: HackedServer-Output
-          path: "**/build/libs/*all.jar" # سيجلب لك الملف النهائي مباشرة
+          name: HackedServer-Final
+          path: "hackedserver-spigot/build/libs/*-all.jar"

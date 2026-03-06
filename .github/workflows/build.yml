@@ -1,43 +1,27 @@
 name: Build HackedServer
-
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: Grant permission for gradlew
+      - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Paper
-        run: ./gradlew :paper:build -x test
+      - name: Build with Gradle
+        run: ./gradlew build -x test
 
-      - name: Build Velocity
-        run: ./gradlew :velocity:build -x test
-
-      - name: Upload Paper Jar
+      - name: Upload Jar
         uses: actions/upload-artifact@v4
         with:
-          name: paper-jar
-          path: paper/build/libs/*.jar
-
-      - name: Upload Velocity Jar
-        uses: actions/upload-artifact@v4
-        with:
-          name: velocity-jar
-          path: velocity/build/libs/*.jar
+          name: HackedServer-Jars
+          path: "**/build/libs/*.jar"

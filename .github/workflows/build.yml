@@ -1,4 +1,4 @@
-name: Tidy Build HackedServer (Gradle)
+name: Build HackedServer Organized
 on: workflow_dispatch
 
 jobs:
@@ -15,25 +15,23 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        # هنستخدم أوامر Gradle عشان نضمن إن البيلد يشتغل صح
+        # الأمر ده بيطلع النسخة الكاملة (Shadow) لكل الأقسام
         run: |
           chmod +x gradlew
-          ./gradlew build shadowJar --no-daemon
+          ./gradlew clean shadowJar --no-daemon
 
-      - name: Organize Files Neatly
-        # الخطوة دي هتعمل فولدرات وتفرز الملفات جواها
+      - name: Organize Artifacts
+        # هنا بنرتب الملفات في مجلدات واضحة ومنفصلة
         run: |
-          mkdir -p Output/Spigot
-          mkdir -p Output/Velocity
-          mkdir -p Output/Core
+          mkdir -p output/spigot
+          mkdir -p output/velocity
           
-          # سحب الملفات من مجلدات build/libs الخاصة بكل قسم
-          find . -path "*/hackedserver-spigot/build/libs/*.jar" -exec cp {} Output/Spigot/ \; || true
-          find . -path "*/hackedserver-velocity/build/libs/*.jar" -exec cp {} Output/Velocity/ \; || true
-          find . -path "*/hackedserver-core/build/libs/*.jar" -exec cp {} Output/Core/ \; || true
+          # بنسحب ملفات الـ all.jar لأنها هي النسخ الشغالة والكاملة
+          cp hackedserver-spigot/build/libs/*-all.jar output/spigot/ || true
+          cp hackedserver-velocity/build/libs/*-all.jar output/velocity/ || true
 
-      - name: Upload Clean Package
+      - name: Upload Files
         uses: actions/upload-artifact@v4
         with:
-          name: HackedServer-Organized-Files
-          path: Output/
+          name: HackedServer-Final-Pack
+          path: output/

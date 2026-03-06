@@ -1,4 +1,4 @@
-name: Tidy Build HackedServer
+name: Tidy Build HackedServer (Gradle)
 on: workflow_dispatch
 
 jobs:
@@ -14,24 +14,23 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Smart Maven Build
-        # الخطوة دي بتدور على ملف الـ pom.xml في أي مكان وتشغله
+      - name: Build with Gradle
+        # هنستخدم أوامر Gradle عشان نضمن إن البيلد يشتغل صح
         run: |
-          MAIN_POM=$(find . -name "pom.xml" | grep -v "src/" | head -n 1)
-          echo "Found POM at: $MAIN_POM"
-          mvn clean package -DskipTests -f "$MAIN_POM"
+          chmod +x gradlew
+          ./gradlew build shadowJar --no-daemon
 
       - name: Organize Files Neatly
-        # الخطوة دي بتعمل مجلدات مرتبة وبتسحب كل ملف تحطه في مكانه
+        # الخطوة دي هتعمل فولدرات وتفرز الملفات جواها
         run: |
           mkdir -p Output/Spigot
           mkdir -p Output/Velocity
           mkdir -p Output/Core
           
-          # نسخ الملفات حسب اسمها للمجلدات الجديدة
-          find . -name "*spigot*.jar" -exec cp {} Output/Spigot/ \;
-          find . -name "*velocity*.jar" -exec cp {} Output/Velocity/ \;
-          find . -name "*core*.jar" -exec cp {} Output/Core/ \;
+          # سحب الملفات من مجلدات build/libs الخاصة بكل قسم
+          find . -path "*/hackedserver-spigot/build/libs/*.jar" -exec cp {} Output/Spigot/ \; || true
+          find . -path "*/hackedserver-velocity/build/libs/*.jar" -exec cp {} Output/Velocity/ \; || true
+          find . -path "*/hackedserver-core/build/libs/*.jar" -exec cp {} Output/Core/ \; || true
 
       - name: Upload Clean Package
         uses: actions/upload-artifact@v4

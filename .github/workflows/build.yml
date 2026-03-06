@@ -7,22 +7,21 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
 
-      - name: Build with Maven
-        # ضفنا السطر ده عشان يتجاهل مكان الـ pom.xml ويجيبه أينما كان
-        run: mvn clean package -DskipTests -f $(find . -name pom.xml | head -n 1)
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
 
       - name: Upload Jar
         uses: actions/upload-artifact@v4
         with:
-          name: HackedServer-Artifact
-          path: "**/target/*.jar"
+          name: HackedServer-Jars
+          path: "**/build/libs/*.jar"

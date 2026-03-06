@@ -1,4 +1,4 @@
-name: Build HackedServer Separate
+name: Tidy Build HackedServer
 on: workflow_dispatch
 
 jobs:
@@ -8,30 +8,33 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
 
-      - name: Build All Modules
-        # هينفذ الـ Build على المشروع بالكامل وكل موديول هيطلع ملفه الخاص
-        run: mvn clean package -DskipTests
+      - name: Smart Maven Build
+        # الخطوة دي بتدور على ملف الـ pom.xml في أي مكان وتشغله
+        run: |
+          MAIN_POM=$(find . -name "pom.xml" | grep -v "src/" | head -n 1)
+          echo "Found POM at: $MAIN_POM"
+          mvn clean package -DskipTests -f "$MAIN_POM"
 
-      - name: Upload Spigot Version
+      - name: Organize Files Neatly
+        # الخطوة دي بتعمل مجلدات مرتبة وبتسحب كل ملف تحطه في مكانه
+        run: |
+          mkdir -p Output/Spigot
+          mkdir -p Output/Velocity
+          mkdir -p Output/Core
+          
+          # نسخ الملفات حسب اسمها للمجلدات الجديدة
+          find . -name "*spigot*.jar" -exec cp {} Output/Spigot/ \;
+          find . -name "*velocity*.jar" -exec cp {} Output/Velocity/ \;
+          find . -name "*core*.jar" -exec cp {} Output/Core/ \;
+
+      - name: Upload Clean Package
         uses: actions/upload-artifact@v4
         with:
-          name: HackedServer-Spigot
-          path: "hackedserver-spigot/target/*.jar"
-
-      - name: Upload Velocity Version
-        uses: actions/upload-artifact@v4
-        with:
-          name: HackedServer-Velocity
-          path: "hackedserver-velocity/target/*.jar"
-
-      - name: Upload Core Version
-        uses: actions/upload-artifact@v4
-        with:
-          name: HackedServer-Core
-          path: "hackedserver-core/target/*.jar"
+          name: HackedServer-Organized-Files
+          path: Output/

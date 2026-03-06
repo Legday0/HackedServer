@@ -1,4 +1,4 @@
-name: Build HackedServer Ultimate
+name: Build HackedServer Final
 on: workflow_dispatch
 
 jobs:
@@ -8,20 +8,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '21' # تحديث ليتوافق مع سيرفرك الحديث
+          java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
+      - name: Build All Modules
+        # الأمر ده هيدور على كل ملف pom.xml في المشروع ويشغله بالترتيب الصح
         run: |
-          POM_PATH=$(find . -name "pom.xml" | head -n 1)
-          mvn clean package -DskipTests -f "$POM_PATH"
+          mvn clean package -DskipTests
 
-      - name: Upload Artifacts
+      - name: Upload Velocity & Spigot Jars
         uses: actions/upload-artifact@v4
         with:
-          name: HackedServer-Final-Pack
-          # السطر ده هيرفع لك كل ملفات الـ Jar اللي طلعت في Spigot و Velocity
+          name: HackedServer-Final-Jars
+          # هنا بناخد أي ملف Jar طلع في أي مجلد target عشان نضمن وصولنا للـ Velocity
           path: "**/target/*.jar"
